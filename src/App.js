@@ -4,9 +4,14 @@ import MessageList from './components/MessageList';
 import SendMessageForm from './components/SendMessageForm';
 import RoomList from './components/RoomList';
 import NewRoomForm from './components/NewRoomForm';
+import Message from './components/Message';
 
 
 class App extends Component {
+
+  state = {
+    messages: []
+  }
 
   componentDidMount() {
 
@@ -37,7 +42,9 @@ class App extends Component {
       roomId: 17122611,
       hooks: {
         onNewMessage: message => {
-          console.log(`message:text: `, message.text)
+          this.setState({
+            messages: [...this.state.messages, message]
+          })
         }
       },
       messageLimit: 10
@@ -52,10 +59,11 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        <Message />
         {/* <RoomList /> */}
-        <MessageList />
-        {/* <SendMessageForm />
-        <NewRoomForm /> */}
+        <MessageList messages={this.state.messages}/>
+        <SendMessageForm />
+        {/* <NewRoomForm /> */}
       </div>
     );
   }
