@@ -17,6 +17,7 @@ class App extends Component {
         joinedRooms: []
       }
       this.sendMessage = this.sendMessage.bind(this);
+      this.subscribeToRoom = this.subscribeToRoom.bind(this);
   }
 
   componentDidMount() {
@@ -30,32 +31,33 @@ class App extends Component {
     })
 
     chatManager.connect()
-    .then(currentUser => {
-      this.currentUser = currentUser
+      .then(currentUser => {
+        this.currentUser = currentUser
 
-      this.currentUser.getJoinableRooms()
-        .then(joinableRooms => {
-          this.setState({
-            joinableRooms,
-            joinedRooms: this.currentUser.rooms
-          })
-        })
-        .catch(err => console.log('error on joinableRooms: ', err))
-
-      this.currentUser.subscribeToRoom({
-        roomId: 17122611,
-        hooks: {
-          onNewMessage: message => {
+        this.currentUser.getJoinableRooms()
+          .then(joinableRooms => {
             this.setState({
-              messages: [...this.state.messages, message]
+              joinableRooms,
+              joinedRooms: this.currentUser.rooms
             })
-          }
-        },
-        messageLimit: 10
+          })
+          .catch(err =>
+            console.log('error on joinableRooms: ', err))
       })
-    })
-    .catch(err => {
-      console.log('Error on connection', err)
+      .catch(err => {
+        console.log('Error on connection', err)
+    }
+    
+  subscribeToRoom() {
+    this.currentUser.subscribeToRoom({
+      roomId: 17122611,
+      hooks: {
+        onNewMessage: message => {
+          this.setState({
+            messages: [...this.state.messages, message]
+          })
+        }
+      }
     })
   }
 
