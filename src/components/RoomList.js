@@ -8,8 +8,13 @@ class RoomList extends Component {
             <h3>Your rooms:</h3>
                 {this.props.rooms.map(room => {
                     return(
-                        <li key={room.id} className="room">
-                            <a href="#"> # {room.name}</a>
+                        <li 
+                            key={room.id}
+                            className="room">
+                            <a
+                                onClick={() => this.props.subscribeToRoom(room.id)} href="#">
+                                # {room.name}
+                            </a>
                         </li>
                     )
                 })}

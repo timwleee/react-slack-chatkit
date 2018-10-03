@@ -14,14 +14,15 @@ class App extends Component {
       this.state = {
         messages: [],
         joinableRooms: [],
-        joinedRooms: []
+        joinedRooms: [],
+        roomId: null
       }
       this.sendMessage = this.sendMessage.bind(this);
       this.subscribeToRoom = this.subscribeToRoom.bind(this);
+      this.getRooms = this.getRooms.bind(this);
   }
 
   componentDidMount() {
-
     const chatManager = new ChatManager({
       instanceLocator: 'v1:us1:cbd24a76-9599-4dbd-869f-3f31e3fe3991',
       userId: 'tim',
@@ -33,24 +34,30 @@ class App extends Component {
     chatManager.connect()
       .then(currentUser => {
         this.currentUser = currentUser
-
-        this.currentUser.getJoinableRooms()
-          .then(joinableRooms => {
-            this.setState({
-              joinableRooms,
-              joinedRooms: this.currentUser.rooms
-            })
-          })
-          .catch(err =>
-            console.log('error on joinableRooms: ', err))
+        this.getRooms()    
       })
-      .catch(err => {
-        console.log('Error on connection', err)
-    }
+      .catch(err =>
+        console.log('Error on connection: ', err))
+  }
+
+  getRooms(){
+    this.currentUser.getJoinableRooms()
+    .then(joinableRooms => {
+      this.setState({
+        joinableRooms,
+        joinedRooms: this.currentUser.rooms
+      })
+    })
+    .catch(err =>
+      console.log('error on joinableRooms: ', err))
+  }
     
-  subscribeToRoom() {
+  subscribeToRoom(roomId) {
+    this.setState({
+      messages: []
+    })
     this.currentUser.subscribeToRoom({
-      roomId: 17122611,
+      roomId: roomId,
       hooks: {
         onNewMessage: message => {
           this.setState({
@@ -59,12 +66,19 @@ class App extends Component {
         }
       }
     })
+    .then(room => {
+      this.setState({
+        roomId: room.id
+      })
+      this.getRooms()
+    })
+    .catch(err => console.log('error on subscribing to room: ', err))
   }
 
   sendMessage(text) {
     this.currentUser.sendMessage({
       text,
-      roomId: 17122611
+      roomId: this.state.roomId
     });
   };
 
@@ -72,7 +86,9 @@ class App extends Component {
     return (
       <div className="App">
         <Message />
-        <RoomList rooms={[...this.state.joinableRooms, ...this.state.joinedRooms]} />
+        <RoomList
+          subscribeToRoom={this.subscribeToRoom}
+          rooms={[...this.state.joinableRooms, ...this.state.joinedRooms]} />
         <MessageList messages={this.state.messages} />
         <SendMessageForm sendMessage={this.sendMessage} />
         {/* <NewRoomForm /> */}
