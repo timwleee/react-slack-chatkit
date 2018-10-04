@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Message from './Message';
 import ReactDOM from 'react-dom';
+import RoomList from './RoomList';
 
 class MessageList extends Component {
 
@@ -17,6 +18,16 @@ class MessageList extends Component {
   }
 
   render() {
+    if (!this.props.roomId) {
+      return(
+        <div className="message-list">
+          <div className="join-room">
+            Join a Room
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div>
         {this.props.messages.map((message,index) => {
