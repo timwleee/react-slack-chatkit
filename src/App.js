@@ -5,6 +5,7 @@ import SendMessageForm from './components/SendMessageForm';
 import RoomList from './components/RoomList';
 import NewRoomForm from './components/NewRoomForm';
 import Message from './components/Message';
+import './App.css';
 
 
 class App extends Component {
